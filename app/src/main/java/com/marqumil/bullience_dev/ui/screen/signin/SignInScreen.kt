@@ -1,5 +1,6 @@
 package com.marqumil.bullience_dev.ui.screen.signin
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -26,7 +27,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -47,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.marqumil.bullience_dev.ui.common.UiState
+import com.marqumil.bullience_dev.ui.screen.register.RegisterViewModel
 import kotlinx.coroutines.flow.observeOn
 
 
@@ -81,7 +85,6 @@ fun LoginContent(
     val emailErrorState = remember { mutableStateOf(false) }
     val passwordErrorState = remember { mutableStateOf(false) }
     val password = remember { mutableStateOf(TextFieldValue()) }
-    val loginState = remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -174,7 +177,8 @@ fun LoginContent(
                     else -> {
                         passwordErrorState.value = false
                         emailErrorState.value = false
-                        loginState.value = true
+
+                        viewModel.pushLogin(email.value.text, password.value.text)
                     }
                 }
             },
@@ -187,52 +191,14 @@ fun LoginContent(
             colors = ButtonDefaults.buttonColors(Color.Blue)
         )
 
-        if (loginState.value) {
-            viewModel.pushLogin(email.value.text, password.value.text)
-
-//            PushLogin(email = email.value.text, password = password.value.text, onNavigateHome = onNavigateHome)
-            viewModel.uiState.collectAsState(initial = UiState.Loading).value.let { uiState ->
-                when (uiState) {
-                    is UiState.Success -> {
-                        Toast.makeText(LocalContext.current, "Login Success", Toast.LENGTH_SHORT).show()
-                        onNavigateHome()
-                    }
-                    is UiState.Loading -> {
-//                Toast.makeText(LocalContext.current, "Loading", Toast.LENGTH_SHORT).show()
-                        // make loading Indicator
-                        val strokeWidth = 5.dp
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.White),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = CenterHorizontally,
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .drawBehind {
-                                        drawCircle(
-                                            Color.Red,
-                                            radius = size.width / 2 - strokeWidth.toPx() / 2,
-                                            style = Stroke(strokeWidth.toPx()),
-                                            center = center,
-                                        )
-                                    },
-                                color = Color.LightGray,
-                                strokeWidth = strokeWidth,
-                            )
-                        }
-                    }
-                    is UiState.Error -> {
-                        loginState.value = false
-                        Toast.makeText(LocalContext.current, "Login Failed ${uiState.errorMessage}", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        } else {
-            loginState.value = false
-            Log.d("LoginState", "LoginState: false")
-        }
+        val contexts = LocalContext.current
+        LoginViewModelContent(
+            viewModel = viewModel,
+            onNavigateHome = {
+                onNavigateHome()
+            },
+            context = contexts
+        )
 
         Spacer(Modifier.size(16.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
@@ -248,6 +214,33 @@ fun LoginContent(
                 text = " Daftar Akun",
                 color = Color.Blue,
             )
+        }
+    }
+}
+
+@Composable
+fun LoginViewModelContent(
+    viewModel: SignInViewModel,
+    onNavigateHome: () -> Unit,
+    context: Context
+) {
+    val uiState by viewModel.uiState.collectAsState(initial = UiState.Loading)
+
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            is UiState.Success -> {
+                Log.d("LoginState", "Success")
+                Toast.makeText(context, "Login Success", Toast.LENGTH_SHORT).show()
+                onNavigateHome()
+            }
+            is UiState.Loading -> {
+                Log.d("LoginState", "Loading try")
+                Toast.makeText(context, "Loading", Toast.LENGTH_SHORT).show()
+            }
+            is UiState.Error -> {
+                Log.d("LoginState", "Error ${(uiState as UiState.Error).errorMessage}")
+                Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.marqumil.bullience_dev.ui.screen.register
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -26,7 +27,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.currentCompositionLocalContext
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -45,7 +49,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.marqumil.bullience_dev.ui.common.UiState
-import com.marqumil.bullience_dev.ui.screen.signin.SignInViewModel
 
 @Composable
 fun RegisterScreen(
@@ -90,7 +93,7 @@ fun RegisterContent(
             .fillMaxSize()
             .background(Color.White)
             .verticalScroll(scrollState),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
     ) {
         Text(
             text = "Daftar Akun",
@@ -98,7 +101,7 @@ fun RegisterContent(
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, top = 40.dp, bottom = 0.dp)
+                .padding(start = 16.dp, end = 16.dp, top =  64.dp, bottom = 0.dp)
                 .align(Alignment.CenterHorizontally),
             textAlign = TextAlign.Center,
             fontSize = 30.sp,
@@ -234,6 +237,7 @@ fun RegisterContent(
             Text(text = msg, color = Color.Red)
         }
         Spacer(Modifier.size(16.dp))
+
         Button(
             onClick = {
                 when {
@@ -253,14 +257,13 @@ fun RegisterContent(
                         confirmPasswordErrorState.value = true
                     }
                     else -> {
-//                        Toast.makeText(
-//                            context,
-//                            "Registered successfully",
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-//                        onRegisterClick()
-
-                        registerState.value = true
+//                        registerState.value = true
+                        viewModel.pushRegister(
+                            username = name.value.text,
+                            email = email.value.text,
+                            password = password.value.text,
+                            confirmasiPassword = confirmPassword.value.text,
+                        )
                     }
                 }
             },
@@ -273,66 +276,13 @@ fun RegisterContent(
             colors = ButtonDefaults.buttonColors(Color.Blue)
         )
 
-        if (registerState.value) {
-            viewModel.pushRegister(
-                username = name.value.text,
-                email = email.value.text,
-                password = password.value.text,
-                confirmasiPassword = confirmPassword.value.text,
-            )
+        val contexts = LocalContext.current
 
-            viewModel.uiState.collectAsState(initial = UiState.Loading).value.let { uiState ->
-                when (uiState) {
-                    is UiState.Success -> {
-                        Log.d("RegisterState", "Success")
-
-                        Toast.makeText(
-                            context,
-                            "Registered successfully",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        onRegisterClick()
-
-                        registerState.value = false
-                    }
-                    is UiState.Loading -> {
-                        Log.d("RegisterState", "Loading")
-                        val strokeWidth = 5.dp
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.White),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .drawBehind {
-                                        drawCircle(
-                                            Color.Red,
-                                            radius = size.width / 2 - strokeWidth.toPx() / 2,
-                                            style = Stroke(strokeWidth.toPx()),
-                                            center = center,
-                                        )
-                                    },
-                                color = Color.LightGray,
-                                strokeWidth = strokeWidth,
-                            )
-                        }
-                        registerState.value = false
-                    }
-                    is UiState.Error -> {
-                        Log.d("RegisterState", "Error ${uiState.errorMessage}")
-                        Toast.makeText(
-                            context,
-                            "Error",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        registerState.value = false
-                    }
-                }
-            }
-        }
+        RegisterScreenContent(
+            viewModel = viewModel,
+            onRegisterClick = onRegisterClick,
+            context = contexts
+        )
 
         Spacer(Modifier.size(16.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
@@ -350,6 +300,36 @@ fun RegisterContent(
 
         }
     }
+}
+
+
+@Composable
+fun RegisterScreenContent(
+    viewModel: RegisterViewModel,
+    onRegisterClick: () -> Unit,
+    context: Context
+) {
+    val uiState by viewModel.uiState.collectAsState(initial = UiState.Loading)
+
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            is UiState.Success -> {
+                Log.d("RegisterState", "Success")
+                Toast.makeText(context, "Registered successfully", Toast.LENGTH_SHORT).show()
+                onRegisterClick()
+            }
+            is UiState.Loading -> {
+                Log.d("RegisterState", "Loading try")
+                Toast.makeText(context, "Loading", Toast.LENGTH_SHORT).show()
+            }
+            is UiState.Error -> {
+                Log.d("RegisterState", "Error ${(uiState as UiState.Error).errorMessage}")
+                Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    // State-based UI elements (Loading indicator, success message, error message, etc.)
 }
 
 @Preview

@@ -20,5 +20,8 @@ data class ResponseObject<T>(
     val token: MediaSession.Token? = null,
 
     @field:SerializedName("result")
-    val result: String? = null
+    val result: String? = null,
+
+    @field:SerializedName("user")
+    val user: T?
 )

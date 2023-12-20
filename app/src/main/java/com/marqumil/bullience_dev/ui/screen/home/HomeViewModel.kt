@@ -1,13 +1,56 @@
-package com.hanung.bullience.ui.screen.home
+package com.marqumil.bullience_dev.ui.screen.home
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.marqumil.bullience_dev.data.local.SharedPrefs
+import com.marqumil.bullience_dev.data.network.ApiConfig
+import com.marqumil.bullience_dev.data.remote.ResponseObject
+import com.marqumil.bullience_dev.data.remote.response.UserResponse
+import com.marqumil.bullience_dev.ui.common.UiState
+import com.marqumil.bullience_dev.ui.screen.signin.SignInViewModel
+import com.orhanobut.hawk.Hawk
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 class HomeViewModel(
-//    private val repository: CourseRepository
 ) : ViewModel() {
-//    private val _uiState: MutableStateFlow<UiState<OrderCourse>> =
-//        MutableStateFlow(UiState.Loading)
-//    val uiState: StateFlow<UiState<OrderCourse>>
-//        get() = _uiState
+    private val _uiState: MutableStateFlow<UiState<ResponseObject<UserResponse>>> =
+        MutableStateFlow(UiState.Loading)
+    val uiState: StateFlow<UiState<ResponseObject<UserResponse>>>
+        get() = _uiState
 
+    fun getUser() {
+        _uiState.value = UiState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            Log.d("UserState vm", "Try")
+            try {
+                val token = Hawk.get<String>(SharedPrefs.KEY_LOGIN)
+                val apiClient = ApiConfig.getApiService().getUserWithToken(
+                    "Bearer $token"
+                )
+                val data = apiClient.user
+                Log.d("UserState vm", "$data")
+                if (data != null) {
+                    Log.d("UserState vm", "Success")
+                    _uiState.value = UiState.Success(apiClient)
+                } else {
+                    Log.d("UserState vm", "Error tanpa msg")
+                    _uiState.value = UiState.Error(
+                        apiClient.message ?: " Error")
+                }
+            } catch (e: Exception) {
+                Log.d("UserState vm", "Error exception ${e.message}")
+                _uiState.value = UiState.Error(e.message ?: "Unknown Error")
+            }
+        }
+    }
 }

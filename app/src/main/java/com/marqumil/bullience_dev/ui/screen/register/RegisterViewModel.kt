@@ -12,21 +12,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 
-//private val email = Hawk.get<LoginResponse?>(SharedPrefs.KEY_LOGIN)?.token
-//
-//private val _nikError = MutableLiveData<String>()
-//val nikError : LiveData<String> = _nikError
-//
-//private val _passwordError = MutableLiveData<String>()
-//val passwordError : LiveData<String> = _passwordError
-//
-//private val _loginState = MutableLiveData<ResultState<Boolean>>()
-//val loginState : LiveData<ResultState<Boolean>> = _loginState
-//
-//private val _userState = MutableLiveData<ResultState<LoginResponse>>()
-//val userState : LiveData<ResultState<LoginResponse>> = _userState
-
-
 class RegisterViewModel(
 //    private val repository: CourseRepository
 ) : ViewModel() {
@@ -44,21 +29,21 @@ class RegisterViewModel(
         username: String,
         email: String,
         password: String,
-        confirmasiPassword: String,
+        confirmasiPassword: String
     ) {
         _uiState.value = UiState.Loading
         viewModelScope.launch {
             val signUpBody =  SignUpBody(username, email, password, confirmasiPassword)
 
-            val apiClient = ApiConfig.getApiService().postRegister(signUpBody)
-            Log.d("RegisterVM", " TRY : ${apiClient.message} ")
             try {
+                val apiClient = ApiConfig.getApiService().postRegister(signUpBody)
+                Log.d("RegisterVM", " TRY : ${apiClient.message} ")
                 if (apiClient.message == "Akun berhasil didaftarkan") {
                     _uiState.value = UiState.Success(apiClient)
-                    Log.d("RegisterVM", "Success")
+                    Log.d("RegisterVM", "Success1")
                 } else {
                     _uiState.value = UiState.Error(apiClient.message ?: " Error")
-                    Log.d("RegisterVM", " ${apiClient.message} ")
+                    Log.d("RegisterVM", " ${apiClient.message} Error")
                 }
 
             } catch (e : Exception) {

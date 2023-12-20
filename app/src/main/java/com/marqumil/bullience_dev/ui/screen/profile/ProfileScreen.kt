@@ -1,6 +1,9 @@
 package com.marqumil.bullience_dev.ui.screen.profile
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -40,12 +43,20 @@ fun ProfileContent(
     onNavigateLogin: () -> Unit,
     navController: NavController
 ) {
-    Box(
-        modifier = modifier.fillMaxWidth(),
-        contentAlignment = Alignment.BottomCenter,
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Top,
     ) {
         Text(stringResource(R.string.menu_profile))
 
+
+    }
+    Spacer(modifier = Modifier.padding(8.dp))
+    Column (
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Button(
             onClick = {
                 Hawk.delete(SharedPrefs.KEY_LOGIN)
@@ -60,7 +71,6 @@ fun ProfileContent(
                 .padding(start = 8.dp, end = 8.dp, top = 0.dp, bottom = 8.dp),
             colors = ButtonDefaults.buttonColors(Color.Blue)
         )
-
     }
 }
 

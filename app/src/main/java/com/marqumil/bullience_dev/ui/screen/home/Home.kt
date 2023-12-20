@@ -1,5 +1,8 @@
 package com.marqumil.bullience_dev.ui.screen.home
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,17 +19,27 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.marqumil.bullience_dev.R
+import com.marqumil.bullience_dev.ui.common.UiState
+import com.marqumil.bullience_dev.ui.screen.signin.SignInViewModel
 import com.marqumil.bullience_dev.ui.theme.BannerColor
 
 @Composable
@@ -46,9 +59,31 @@ fun HomeScreen(
 @Composable
 fun HomeContent(
     modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel(),
     onBackClick: () -> Unit,
     onNavigateLapor: () -> Unit
 ) {
+    var email = ""
+
+    viewModel.getUser()
+    val userValue by viewModel.uiState.collectAsState(initial = UiState.Loading)
+    // get data
+    when (userValue) {
+        is UiState.Success -> {
+            val data = (userValue as UiState.Success).data
+            email = data.user?.email.toString()
+            Log.d("UserState", "Success $email")
+        }
+        is UiState.Loading -> {
+            Log.d("UserState", "Loading try")
+            email = "Loading"
+        }
+        is UiState.Error -> {
+            Log.d("UserState", "Error ${(userValue as UiState.Error).errorMessage}")
+            email = "Error"
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -76,7 +111,7 @@ fun HomeContent(
                     .align(Alignment.CenterVertically)
                     .padding(8.dp)
                     .background(color = Color.White),
-                text = stringResource(id = R.string.Hallo) + " " + stringResource(id = R.string.app_name),
+                text = (stringResource(id = R.string.Hallo) + " " + email),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Black,
                 textAlign = TextAlign.Center,
@@ -163,6 +198,34 @@ fun HomeContent(
         )
     }
 }
+
+
+@Composable
+fun UserViewModelContent(
+    viewModel: HomeViewModel,
+    context: Context
+) {
+    val uiState by viewModel.uiState.collectAsState(initial = UiState.Loading)
+
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            is UiState.Success -> {
+                Log.d("UserState", "Success")
+                Toast.makeText(context, "Login Success", Toast.LENGTH_SHORT).show()
+                val data = (uiState as UiState.Success).data
+            }
+            is UiState.Loading -> {
+                Log.d("UserState", "Loading try")
+                Toast.makeText(context, "Loading", Toast.LENGTH_SHORT).show()
+            }
+            is UiState.Error -> {
+                Log.d("UserState", "Error ${(uiState as UiState.Error).errorMessage}")
+                Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 fun HomeScreenPreview() {
