@@ -38,9 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.marqumil.bullience_dev.R
+import com.marqumil.bullience_dev.data.local.SharedPrefs
 import com.marqumil.bullience_dev.ui.common.UiState
 import com.marqumil.bullience_dev.ui.screen.signin.SignInViewModel
 import com.marqumil.bullience_dev.ui.theme.BannerColor
+import com.orhanobut.hawk.Hawk
 
 @Composable
 fun HomeScreen(
@@ -63,26 +65,27 @@ fun HomeContent(
     onBackClick: () -> Unit,
     onNavigateLapor: () -> Unit
 ) {
-    var email = ""
+//    var email = ""
 
     viewModel.getUser()
-    val userValue by viewModel.uiState.collectAsState(initial = UiState.Loading)
+    val email = Hawk.get(SharedPrefs.EMAIL, "") // masi dipikirin
+//    val userValue by viewModel.uiState.collectAsState(initial = UiState.Loading)
     // get data
-    when (userValue) {
-        is UiState.Success -> {
-            val data = (userValue as UiState.Success).data
-            email = data.user?.email.toString()
-            Log.d("UserState", "Success $email")
-        }
-        is UiState.Loading -> {
-            Log.d("UserState", "Loading try")
-            email = "Loading"
-        }
-        is UiState.Error -> {
-            Log.d("UserState", "Error ${(userValue as UiState.Error).errorMessage}")
-            email = "Error"
-        }
-    }
+//    when (userValue) {
+//        is UiState.Success -> {
+//            val data = (userValue as UiState.Success).data
+//            email = data.user?.email.toString()
+//            Log.d("UserState", "Success $email")
+//        }
+//        is UiState.Loading -> {
+//            Log.d("UserState", "Loading try")
+//            email = "Loading"
+//        }
+//        is UiState.Error -> {
+//            Log.d("UserState", "Error ${(userValue as UiState.Error).errorMessage}")
+//            email = "Error"
+//        }
+//    }
 
     Column(
         modifier = modifier

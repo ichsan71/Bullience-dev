@@ -41,6 +41,7 @@ class HomeViewModel(
                 Log.d("UserState vm", "$data")
                 if (data != null) {
                     Log.d("UserState vm", "Success")
+                    Hawk.put(SharedPrefs.EMAIL, data.email)
                     _uiState.value = UiState.Success(apiClient)
                 } else {
                     Log.d("UserState vm", "Error tanpa msg")
