@@ -5,9 +5,11 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -15,6 +17,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,8 +43,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.marqumil.bullience_dev.R
+import com.marqumil.bullience_dev.ViewModelFactory
+import com.marqumil.bullience_dev.data.di.Injection
 import com.marqumil.bullience_dev.data.local.SharedPrefs
+import com.marqumil.bullience_dev.model.TotalNews
 import com.marqumil.bullience_dev.ui.common.UiState
+import com.marqumil.bullience_dev.ui.components.NewsItem
 import com.marqumil.bullience_dev.ui.screen.signin.SignInViewModel
 import com.marqumil.bullience_dev.ui.theme.BannerColor
 import com.orhanobut.hawk.Hawk
@@ -47,14 +56,32 @@ import com.orhanobut.hawk.Hawk
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel(
+        factory = ViewModelFactory(
+            Injection.provideRepository()
+        )
+    ),
     navigateBack: () -> Unit,
-    navigateToLapor: () -> Unit
+    navigateToLapor: () -> Unit,
+    navigateToDetail: (Long) -> Unit
 ) {
-    HomeContent(
-        modifier = modifier,
-        onBackClick = navigateBack,
-        onNavigateLapor = navigateToLapor,
-    )
+    viewModel.uiStateNews.collectAsState(initial = UiState.Loading).value.let { uiState ->
+        when (uiState) {
+            is UiState.Loading -> {
+                viewModel.getAllNews()
+            }
+            is UiState.Success -> {
+                HomeContent(
+                    modifier = modifier,
+                    onBackClick = navigateBack,
+                    onNavigateLapor = navigateToLapor,
+                    totalNews = uiState.data,
+                    onNavigateDetail = navigateToDetail
+                )
+            }
+            is UiState.Error -> {}
+        }
+    }
 
 }
 
@@ -63,7 +90,9 @@ fun HomeContent(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(),
     onBackClick: () -> Unit,
-    onNavigateLapor: () -> Unit
+    onNavigateLapor: () -> Unit,
+    totalNews: List<TotalNews>,
+    onNavigateDetail: (Long) -> Unit,
 ) {
 //    var email = ""
 
@@ -199,6 +228,23 @@ fun HomeContent(
             textAlign = TextAlign.Start,
             fontSize = 18.sp,
         )
+        Spacer(modifier = Modifier.padding(5.dp))
+        LazyColumn(
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = modifier
+        ) {
+            items(totalNews) { data ->
+                NewsItem(
+                    image = data.news.image,
+                    title = data.news.title,
+                    desc = data.news.desc,
+                    modifier = Modifier.clickable {
+                        onNavigateDetail(data.news.id)
+                    },
+                )
+            }
+        }
     }
 }
 
@@ -229,11 +275,13 @@ fun UserViewModelContent(
     }
 }
 
+
 @Preview
 @Composable
 fun HomeScreenPreview() {
     HomeScreen(
         navigateBack = {},
         navigateToLapor = {},
+        navigateToDetail = {}
     )
 }

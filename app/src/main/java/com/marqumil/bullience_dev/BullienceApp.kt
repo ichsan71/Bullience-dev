@@ -80,6 +80,15 @@ fun BullienceApp(
                             launchSingleTop = true
                             restoreState = true
                         }
+                    },
+                    navigateToDetail = { id ->
+                        navController.navigate(Screen.DetailLapor.route + "/$id") {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
                 )
             }

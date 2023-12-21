@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 
 class RegisterViewModel(
-//    private val repository: CourseRepository
+//    private val repository: NewsRepository
 ) : ViewModel() {
 //    private val _uiState: MutableStateFlow<UiState<List<OrderCourse>>> = MutableStateFlow(UiState.Loading)
 //    val uiState: StateFlow<UiState<List<OrderCourse>>>

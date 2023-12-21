@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 
 
 class ProfileViewModel(
-//    private val repository: CourseRepository
+//    private val repository: NewsRepository
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<UiState<LoginResponse>> = MutableStateFlow(UiState.Loading)

@@ -8,6 +8,9 @@ import kotlinx.parcelize.Parcelize
 
 data class LoginResponse(
 
+	@field:SerializedName("status")
+	val status: String? = null,
+
 	@field:SerializedName("msg")
 	val message: String? = null,
 
