@@ -94,27 +94,32 @@ fun HomeContent(
     totalNews: List<TotalNews>,
     onNavigateDetail: (Long) -> Unit,
 ) {
-//    var email = ""
+    var localEmail = ""
+    var localUsername = ""
 
-    viewModel.getUser()
-    val email = Hawk.get(SharedPrefs.EMAIL, "") // masi dipikirin
-//    val userValue by viewModel.uiState.collectAsState(initial = UiState.Loading)
-    // get data
-//    when (userValue) {
-//        is UiState.Success -> {
-//            val data = (userValue as UiState.Success).data
-//            email = data.user?.email.toString()
-//            Log.d("UserState", "Success $email")
-//        }
-//        is UiState.Loading -> {
-//            Log.d("UserState", "Loading try")
-//            email = "Loading"
-//        }
-//        is UiState.Error -> {
-//            Log.d("UserState", "Error ${(userValue as UiState.Error).errorMessage}")
-//            email = "Error"
-//        }
-//    }
+    var email = ""
+    var username = ""
+
+    val userValue by viewModel.uiState.collectAsState(initial = UiState.Loading)
+
+    when (userValue) {
+        is UiState.Success -> {
+            val data = (userValue as UiState.Success).data
+            email = data.user?.email.toString()
+            username = data.user?.username.toString()
+            localEmail = Hawk.get(SharedPrefs.EMAIL, "") // masi dipikirin
+            localUsername = Hawk.get(SharedPrefs.NAME, "")
+            Log.d("UserState", "Success $email")
+        }
+        is UiState.Loading -> {
+            Log.d("UserState", "Loading try")
+            email = "Loading"
+        }
+        is UiState.Error -> {
+            Log.d("UserState", "Error ${(userValue as UiState.Error).errorMessage}")
+            email = "Error"
+        }
+    }
 
     Column(
         modifier = modifier
@@ -143,7 +148,7 @@ fun HomeContent(
                     .align(Alignment.CenterVertically)
                     .padding(8.dp)
                     .background(color = Color.White),
-                text = (stringResource(id = R.string.Hallo) + " " + email),
+                text = (stringResource(id = R.string.Hallo) + " " + username),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Black,
                 textAlign = TextAlign.Center,

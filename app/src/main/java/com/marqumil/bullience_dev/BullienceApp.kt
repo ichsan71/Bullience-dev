@@ -21,12 +21,15 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.marqumil.bullience_dev.navigation.NavigationItem
 import com.marqumil.bullience_dev.navigation.Screen
+import com.marqumil.bullience_dev.ui.screen.detail.detailNews.DetailNewsScreen
 import com.marqumil.bullience_dev.ui.screen.home.HomeScreen
 import com.marqumil.bullience_dev.ui.screen.jelajah.JelajahScreen
 import com.marqumil.bullience_dev.ui.screen.lapor.LaporScreen
@@ -56,7 +59,8 @@ fun BullienceApp(
             if (currentRoute != Screen.DetailLapor.route
                 && currentRoute != Screen.SignInScreen.route
                 && currentRoute != Screen.Splash.route
-                && currentRoute != Screen.RegisterScreen.route) {
+                && currentRoute != Screen.RegisterScreen.route
+                && currentRoute != Screen.DetailNews.route) {
                 BottomBar(navController)
             }
         },
@@ -82,13 +86,7 @@ fun BullienceApp(
                         }
                     },
                     navigateToDetail = { id ->
-                        navController.navigate(Screen.DetailLapor.route + "/$id") {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
+                        navController.navigate(Screen.DetailNews.createRoute(id)) {}
                     }
                 )
             }
@@ -167,6 +165,18 @@ fun BullienceApp(
                             launchSingleTop = true
                             restoreState = true
                         }
+                    }
+                )
+            }
+            composable(
+                route = Screen.DetailNews.route,
+                arguments = listOf(navArgument("newsId") { type = NavType.LongType }),
+            ) {
+                val id = it.arguments?.getLong("newsId") ?: -1L
+                DetailNewsScreen(
+                    newsId = id,
+                    navigateBack = {
+                        navController.navigateUp()
                     }
                 )
             }

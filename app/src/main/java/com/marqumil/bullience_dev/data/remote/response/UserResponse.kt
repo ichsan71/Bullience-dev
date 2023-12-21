@@ -8,6 +8,9 @@ data class UserResponse(
 	@field:SerializedName("id")
 	val id: Int? = null,
 
+	@field:SerializedName("username")
+	val username: String? = null,
+
 	@field:SerializedName("email")
 	val email: String? = null,
 
