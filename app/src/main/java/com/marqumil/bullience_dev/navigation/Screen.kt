@@ -3,7 +3,6 @@ package com.marqumil.bullience_dev.navigation
 sealed class Screen(val route: String) {
     object Home : Screen("Home")
     object Lapor : Screen("Lapor")
-    object Jelajah : Screen("Jelajah")
     object Profile : Screen("Profile")
 
     object Splash : Screen("Splash")

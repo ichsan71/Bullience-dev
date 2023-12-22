@@ -1,12 +1,6 @@
 package com.marqumil.bullience_dev.ui.screen.home
 
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.marqumil.bullience_dev.data.NewsRepository
@@ -16,7 +10,6 @@ import com.marqumil.bullience_dev.data.remote.ResponseObject
 import com.marqumil.bullience_dev.data.remote.response.UserResponse
 import com.marqumil.bullience_dev.model.TotalNews
 import com.marqumil.bullience_dev.ui.common.UiState
-import com.marqumil.bullience_dev.ui.screen.signin.SignInViewModel
 import com.orhanobut.hawk.Hawk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

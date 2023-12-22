@@ -1,13 +1,8 @@
 package com.marqumil.bullience_dev.ui.screen.signin
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch as viewModelLaunch
-import com.kitafitapp.kitafit.data.remote.ResultState
-import com.marqumil.bullience_dev.data.local.SharedPrefs
 import com.marqumil.bullience_dev.data.local.SharedPrefs.Companion.KEY_LOGIN
 import com.marqumil.bullience_dev.data.network.ApiConfig
 import com.marqumil.bullience_dev.data.remote.post.LoginBody

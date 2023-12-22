@@ -100,6 +100,7 @@ fun HomeContent(
     var email = ""
     var username = ""
 
+    viewModel.getUser()
     val userValue by viewModel.uiState.collectAsState(initial = UiState.Loading)
 
     when (userValue) {
@@ -234,12 +235,18 @@ fun HomeContent(
             fontSize = 18.sp,
         )
         Spacer(modifier = Modifier.padding(5.dp))
+
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = modifier
         ) {
-            items(totalNews) { data ->
+            items(
+                totalNews,
+                key = { data ->
+                    data.news.id
+                }
+            ) { data ->
                 NewsItem(
                     image = data.news.image,
                     title = data.news.title,

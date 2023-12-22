@@ -31,7 +31,6 @@ import com.marqumil.bullience_dev.navigation.NavigationItem
 import com.marqumil.bullience_dev.navigation.Screen
 import com.marqumil.bullience_dev.ui.screen.detail.detailNews.DetailNewsScreen
 import com.marqumil.bullience_dev.ui.screen.home.HomeScreen
-import com.marqumil.bullience_dev.ui.screen.jelajah.JelajahScreen
 import com.marqumil.bullience_dev.ui.screen.lapor.LaporScreen
 import com.marqumil.bullience_dev.ui.screen.profile.ProfileScreen
 import com.marqumil.bullience_dev.ui.screen.register.RegisterScreen
@@ -90,11 +89,18 @@ fun BullienceApp(
                     }
                 )
             }
-            composable(Screen.Jelajah.route) {
-                JelajahScreen()
-            }
             composable(Screen.Lapor.route) {
-                LaporScreen()
+                LaporScreen(
+                    onNavigateDetail = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
             }
             composable(Screen.Profile.route) {
                 ProfileScreen(
@@ -183,19 +189,6 @@ fun BullienceApp(
         }
     }
 
-//    NavHost(navController = navController, startDestination = "splash_screen") {
-//        composable("splash_screen") {
-//            SplashScreen(navController = navController)
-//        }
-//        composable("main_screen") {
-//            Box(
-//                modifier = Modifier.fillMaxSize(),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                Text(text = "Main_Screen", color = Color.Black)
-//            }
-//        }
-//    }
 }
 
 @Preview(showBackground = true)
@@ -227,11 +220,6 @@ private fun BottomBar(
                 title = stringResource(R.string.menu_lapor),
                 icon = Icons.Default.Warning,
                 screen = Screen.Lapor
-            ),
-            NavigationItem(
-                title = stringResource(R.string.menu_jelajah),
-                icon = ImageVector.vectorResource(id = R.drawable.baseline_library_books_24),
-                screen = Screen.Jelajah
             ),
             NavigationItem(
                 title = stringResource(R.string.menu_profile),
